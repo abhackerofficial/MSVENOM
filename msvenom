@@ -33,6 +33,11 @@ echo -e '\033[1;92m[!] Choose your App Name'
 read -p 'msvenom > ' app
 printf '\033[0m\033[1;93m'
 
+if [ ! -d '/data/data/com.termux/files/home/storage' ];then
+termux-setup-storage
+sleep 5
+fi
+
 spin () {
 
 local pid=$!
